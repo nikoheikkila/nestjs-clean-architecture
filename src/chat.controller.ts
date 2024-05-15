@@ -8,12 +8,12 @@ import {
   HttpStatus,
   Post,
 } from '@nestjs/common';
-import { ChatService } from './chat.service';
-import { ChatPayload } from './interfaces';
+import { ChatPayload, ChatService } from './interfaces';
+import { OpenAIChatService } from "./chat.service";
 
 @Controller('api/v1/chat')
 export class ChatController {
-  constructor(private readonly chatService: ChatService) {}
+  constructor(private readonly chatService: OpenAIChatService) {}
 
   @Post()
   @HttpCode(HttpStatus.OK)
@@ -42,7 +42,7 @@ export class ChatController {
       );
     }
 
-    const answer = await this.chatService.generateAnswer();
+    const answer = await this.chatService.generateAnswer(prompt, { temperature });
     const duration = 500;
 
     return { answer, temperature, duration };
