@@ -1,7 +1,16 @@
-import { Body, Controller, Header, Headers, HttpCode, HttpException, HttpStatus, Post } from "@nestjs/common";
-import { ChatPayload } from "./interfaces";
-import { OpenAIChatService } from "./chat.service";
-import { TimerService } from "./timer.service";
+import {
+  Body,
+  Controller,
+  Header,
+  Headers,
+  HttpCode,
+  HttpException,
+  HttpStatus,
+  Post,
+} from '@nestjs/common';
+import { ChatPayload } from './interfaces';
+import { OpenAIChatService } from './chat.service';
+import { TimerService } from './timer.service';
 
 @Controller('api/v1/chat')
 export class ChatController {
@@ -42,8 +51,10 @@ export class ChatController {
     const answer = await this.chatService.generateAnswer(prompt, {
       temperature,
     });
+
     const duration = this.timerService.stop();
 
     return { answer, temperature, duration };
   }
 }
+
