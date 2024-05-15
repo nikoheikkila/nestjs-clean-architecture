@@ -31,6 +31,10 @@ class NullLogger implements LoggerService {
     return this._entries;
   }
 
+  public debug(message: any): any {
+    this._entries.push(message);
+  }
+
   public error(message: string): void {
     this._entries.push(message);
   }
