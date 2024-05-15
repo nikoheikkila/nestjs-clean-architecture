@@ -9,7 +9,8 @@ export class ChatController {
   @HttpCode(HttpStatus.OK)
   public async chat() {
     const answer = await this.chatService.generateAnswer();
+    const duration = 500;
 
-    return { answer };
+    return { answer, duration };
   }
 }

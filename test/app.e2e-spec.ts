@@ -17,8 +17,9 @@ describe('ChatController', () => {
 
   describe('POST /api/v1/chat', () => {
 
-    it('responds to a valid prompt with generated answer', async () => {
+    it('responds to a valid prompt with generated answer and duration', async () => {
       const expectedResponse = 'Hello, I am ChatGPT';
+      const expectedDuration = 500;
 
       const { body, status } = await request(app.getHttpServer())
         .post('/api/v1/chat')
@@ -27,6 +28,7 @@ describe('ChatController', () => {
 
       expect(status).toBe(HttpStatus.OK);
       expect(body.answer).toBe(expectedResponse);
+      expect(body.duration).toBe(expectedDuration);
     });
   });
 });
