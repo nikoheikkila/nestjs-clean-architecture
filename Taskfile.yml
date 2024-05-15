@@ -16,8 +16,18 @@ tasks:
     cmds:
       - npx nest start --watch
 
-  test:
+  format:
     deps: [install]
+    cmds:
+      - yarn format
+
+  lint:
+    deps: [install, format]
+    cmds:
+      - yarn lint
+
+  test:
+    deps: [install, lint]
     cmds:
       - npx jest --config ./test/jest-e2e.json
 
