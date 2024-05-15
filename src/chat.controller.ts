@@ -3,6 +3,7 @@ import { ChatService } from './chat.service';
 
 interface ChatPayload {
   prompt: string;
+  temperature: number;
 }
 
 @Controller('api/v1/chat')
@@ -12,7 +13,7 @@ export class ChatController {
   @Post()
   @HttpCode(HttpStatus.OK)
   public async chat(@Body() chatPayload: ChatPayload) {
-    const { prompt } = chatPayload;
+    const { prompt, temperature } = chatPayload;
 
     if (prompt.length === 0) {
       throw new HttpException('Prompt cannot be empty', HttpStatus.BAD_REQUEST);
@@ -21,6 +22,6 @@ export class ChatController {
     const answer = await this.chatService.generateAnswer();
     const duration = 500;
 
-    return { answer, duration };
+    return { answer, temperature, duration };
   }
 }
