@@ -1,0 +1,19 @@
+# https://taskfile.dev
+
+version: '3'
+
+tasks:
+
+  serve:
+    cmds:
+      - docker compose up --build -d
+      - docker compose logs -f
+
+  test:integration:
+    dir: test/specs
+    silent: true
+    cmds:
+      - hurl --test --variable API_KEY={{ .API_KEY }} *.hurl
+    vars:
+      API_KEY:
+        sh: op read "op://Employee/OpenAI/Security/API_KEY"
