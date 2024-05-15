@@ -1,0 +1,7 @@
+*
+!dist/
+!src/
+!package.json
+!tsconfig*.json
+!yarn.lock
+
