@@ -4,6 +4,23 @@ version: '3'
 
 tasks:
 
+  install:
+    sources:
+      - package.json
+      - yarn.lock
+    cmds:
+      - yarn
+
+  dev:
+    deps: [install]
+    cmds:
+      - npx nest start --watch
+
+  test:
+    deps: [install]
+    cmds:
+      - npx jest --config ./test/jest-e2e.json
+
   serve:
     cmds:
       - docker compose up --build -d
