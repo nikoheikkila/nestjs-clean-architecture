@@ -1,4 +1,12 @@
-import { Body, Controller, HttpCode, HttpException, HttpStatus, Post, Req } from "@nestjs/common";
+import {
+  Body,
+  Controller,
+  HttpCode,
+  HttpException,
+  HttpStatus,
+  Post,
+  Req,
+} from '@nestjs/common';
 import { ChatService } from './chat.service';
 
 interface ChatPayload {
@@ -17,6 +25,13 @@ export class ChatController {
 
     if (prompt.length === 0) {
       throw new HttpException('Prompt cannot be empty', HttpStatus.BAD_REQUEST);
+    }
+
+    if (temperature <= 0.0) {
+      throw new HttpException(
+        'Temperature must be greater than 0.0',
+        HttpStatus.BAD_REQUEST,
+      );
     }
 
     const answer = await this.chatService.generateAnswer();

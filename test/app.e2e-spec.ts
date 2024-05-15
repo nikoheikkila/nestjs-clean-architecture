@@ -42,5 +42,15 @@ describe('ChatController', () => {
       expect(status).toBe(HttpStatus.BAD_REQUEST);
       expect(body.message).toBe('Prompt cannot be empty');
     });
+
+    it('throws error for invalid temperature', async () => {
+      const { status, body } = await request(app.getHttpServer())
+        .post('/api/v1/chat')
+        .set('X-OpenAI-API-Key', 'ad7f9f0d-77ea-48f1-a8d8-c9d91727da47')
+        .send({ prompt: 'Hello, who are you?', temperature: -1.0 });
+
+      expect(status).toBe(HttpStatus.BAD_REQUEST);
+      expect(body.message).toBe('Temperature must be greater than 0.0');
+    });
   });
 });
