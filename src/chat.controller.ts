@@ -1,11 +1,12 @@
 import {
   Body,
   Controller,
+  Header,
+  Headers,
   HttpCode,
   HttpException,
   HttpStatus,
   Post,
-  Req,
 } from '@nestjs/common';
 import { ChatService } from './chat.service';
 
@@ -20,7 +21,18 @@ export class ChatController {
 
   @Post()
   @HttpCode(HttpStatus.OK)
-  public async chat(@Body() chatPayload: ChatPayload) {
+  @Header('Content-Type', 'application/json')
+  public async chat(
+    @Body() chatPayload: ChatPayload,
+    @Headers() headers: Record<string, unknown>,
+  ) {
+    if (!headers['x-openai-api-key']) {
+      throw new HttpException(
+        'Missing OpenAI API key in header',
+        HttpStatus.UNAUTHORIZED,
+      );
+    }
+
     const { prompt, temperature } = chatPayload;
 
     if (prompt.length === 0) {

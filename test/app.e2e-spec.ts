@@ -52,5 +52,14 @@ describe('ChatController', () => {
       expect(status).toBe(HttpStatus.BAD_REQUEST);
       expect(body.message).toBe('Temperature must be greater than 0.0');
     });
+
+    it('throws error for missing API key', async () => {
+      const { status, body } = await request(app.getHttpServer())
+        .post('/api/v1/chat')
+        .send({ prompt: 'Hello, who are you?', temperature: 1.0 });
+
+      expect(status).toBe(HttpStatus.UNAUTHORIZED);
+      expect(body.message).toBe('Missing OpenAI API key in header');
+    });
   });
 });
