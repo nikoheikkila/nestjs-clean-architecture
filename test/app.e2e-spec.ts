@@ -1,5 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { INestApplication } from '@nestjs/common';
+import { HttpStatus, INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
 import { AppModule } from '../src/app.module';
 
@@ -16,11 +16,17 @@ describe('ChatController', () => {
   });
 
   describe('POST /api/v1/chat', () => {
-    it('responds with Hello', () => {
-      return request(app.getHttpServer())
-        .get('/api/v1/chat')
-        .expect(200)
-        .expect('Hello World!');
+
+    it('responds to a valid prompt with generated answer', async () => {
+      const expectedResponse = 'Hello, I am ChatGPT';
+
+      const { body, status } = await request(app.getHttpServer())
+        .post('/api/v1/chat')
+        .set('X-OpenAI-API-Key', 'ad7f9f0d-77ea-48f1-a8d8-c9d91727da47')
+        .send({ prompt: 'Hello, who are you?' });
+
+      expect(status).toBe(HttpStatus.OK);
+      expect(body.answer).toBe(expectedResponse);
     });
   });
 });
