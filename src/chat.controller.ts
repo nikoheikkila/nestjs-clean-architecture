@@ -1,19 +1,14 @@
-import {
-  Body,
-  Controller,
-  Header,
-  Headers,
-  HttpCode,
-  HttpException,
-  HttpStatus,
-  Post,
-} from '@nestjs/common';
-import { ChatPayload, ChatService } from './interfaces';
+import { Body, Controller, Header, Headers, HttpCode, HttpException, HttpStatus, Post } from "@nestjs/common";
+import { ChatPayload } from "./interfaces";
 import { OpenAIChatService } from "./chat.service";
+import { TimerService } from "./timer.service";
 
 @Controller('api/v1/chat')
 export class ChatController {
-  constructor(private readonly chatService: OpenAIChatService) {}
+  constructor(
+    private readonly chatService: OpenAIChatService,
+    private readonly timerService: TimerService,
+  ) {}
 
   @Post()
   @HttpCode(HttpStatus.OK)
@@ -22,6 +17,8 @@ export class ChatController {
     @Body() chatPayload: ChatPayload,
     @Headers() headers: Record<string, unknown>,
   ) {
+    this.timerService.start();
+
     if (!headers['x-openai-api-key']) {
       throw new HttpException(
         'Missing OpenAI API key in header',
@@ -42,8 +39,10 @@ export class ChatController {
       );
     }
 
-    const answer = await this.chatService.generateAnswer(prompt, { temperature });
-    const duration = 500;
+    const answer = await this.chatService.generateAnswer(prompt, {
+      temperature,
+    });
+    const duration = this.timerService.stop();
 
     return { answer, temperature, duration };
   }

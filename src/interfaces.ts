@@ -10,3 +10,8 @@ export interface ChatOptions {
 export interface ChatService {
   generateAnswer(prompt: string, options: ChatOptions): Promise<string>;
 }
+
+export interface Timer {
+  start(): void;
+  stop(): number;
+}

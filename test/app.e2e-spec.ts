@@ -2,12 +2,20 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { HttpStatus, INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
 import { AppModule } from '../src/app.module';
-import { ChatPayload, ChatService } from '../src/interfaces';
+import { ChatPayload, ChatService, Timer } from '../src/interfaces';
 import { OpenAIChatService } from '../src/chat.service';
+import { TimerService } from "../src/timer.service";
 
 class FakeChatService implements ChatService {
   async generateAnswer(prompt: string): Promise<string> {
     return `Response: ${prompt}`;
+  }
+}
+
+class FakeTimerService implements Timer {
+  start() {}
+  stop() {
+    return 1000;
   }
 }
 
@@ -20,6 +28,8 @@ describe('ChatController', () => {
     })
       .overrideProvider(OpenAIChatService)
       .useClass(FakeChatService)
+      .overrideProvider(TimerService)
+      .useClass(FakeTimerService)
       .compile();
 
     app = moduleFixture.createNestApplication();
@@ -41,7 +51,7 @@ describe('ChatController', () => {
     it('responds to a valid prompt and temperature with generated answer and duration', async () => {
       const prompt = 'Hello';
       const expectedResponse = 'Response: Hello';
-      const expectedDuration = 500;
+      const expectedDuration = 1000;
       const temperature = 1.0;
 
       const { body, status } = await authorizedPost({
