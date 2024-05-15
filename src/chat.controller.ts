@@ -1,27 +1,32 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Header,
   Headers,
   HttpCode,
-  HttpException,
   HttpStatus,
+  Inject,
+  LoggerService,
   Post,
   Req,
+  UnauthorizedException,
 } from '@nestjs/common';
-import { ChatPayload } from './interfaces';
+import { ChatPayload, ChatService, Timer } from './interfaces';
 import { OpenAIChatService } from './chat.service';
 import { TimerService } from './timer.service';
 import { StructuredLogger } from './logger.service';
 import * as process from 'node:process';
-import { Errors } from "./errors";
+import { Errors } from './errors';
+
+const OPENAI_API_KEY = 'x-openai-api-key';
 
 @Controller('api/v1/chat')
 export class ChatController {
   constructor(
-    private readonly chatService: OpenAIChatService,
-    private readonly timerService: TimerService,
-    private readonly logger: StructuredLogger,
+    @Inject(OpenAIChatService) private readonly chatService: ChatService,
+    @Inject(TimerService) private readonly timerService: Timer,
+    @Inject(StructuredLogger) private readonly logger: LoggerService,
   ) {}
 
   @Post()
@@ -30,7 +35,7 @@ export class ChatController {
   public async chat(
     @Req() request: Request,
     @Body() chatPayload: ChatPayload,
-    @Headers() headers: Record<string, unknown>,
+    @Headers(OPENAI_API_KEY) token: string,
   ) {
     const payload = {
       method: request.method,
@@ -40,29 +45,21 @@ export class ChatController {
 
     this.logger.debug('Received a new request', payload);
 
-    const token = headers['x-openai-api-key'] as string;
-
     if (!token) {
       this.logger.error(Errors.MISSING_OPENAI_API_KEY, payload);
-      throw new HttpException(
-        Errors.MISSING_OPENAI_API_KEY,
-        HttpStatus.UNAUTHORIZED,
-      );
+      throw new UnauthorizedException(Errors.MISSING_OPENAI_API_KEY);
     }
 
     const { prompt, temperature } = chatPayload;
 
     if (prompt.length === 0) {
       this.logger.error(Errors.EMPTY_PROMPT, payload);
-      throw new HttpException(Errors.EMPTY_PROMPT, HttpStatus.BAD_REQUEST);
+      throw new BadRequestException(Errors.EMPTY_PROMPT);
     }
 
     if (temperature <= 0.0) {
       this.logger.error(Errors.INVALID_TEMPERATURE, payload);
-      throw new HttpException(
-        Errors.INVALID_TEMPERATURE,
-        HttpStatus.BAD_REQUEST,
-      );
+      throw new BadRequestException(Errors.INVALID_TEMPERATURE);
     }
 
     this.timerService.start();
