@@ -14,6 +14,7 @@ import { OpenAIChatService } from './chat.service';
 import { TimerService } from './timer.service';
 import { StructuredLogger } from './logger.service';
 import * as process from 'node:process';
+import { Errors } from "./errors";
 
 @Controller('api/v1/chat')
 export class ChatController {
@@ -37,14 +38,14 @@ export class ChatController {
       process: process.pid,
     };
 
-    this.logger.debug('Received request', payload);
+    this.logger.debug('Received a new request', payload);
 
     const token = headers['x-openai-api-key'] as string;
 
     if (!token) {
-      this.logger.error('Missing OpenAI API key in header', payload);
+      this.logger.error(Errors.MISSING_OPENAI_API_KEY, payload);
       throw new HttpException(
-        'Missing OpenAI API key in header',
+        Errors.MISSING_OPENAI_API_KEY,
         HttpStatus.UNAUTHORIZED,
       );
     }
@@ -52,14 +53,14 @@ export class ChatController {
     const { prompt, temperature } = chatPayload;
 
     if (prompt.length === 0) {
-      this.logger.error('Prompt cannot be empty', payload);
-      throw new HttpException('Prompt cannot be empty', HttpStatus.BAD_REQUEST);
+      this.logger.error(Errors.EMPTY_PROMPT, payload);
+      throw new HttpException(Errors.EMPTY_PROMPT, HttpStatus.BAD_REQUEST);
     }
 
     if (temperature <= 0.0) {
-      this.logger.error('Temperature must be greater than 0.0', payload);
+      this.logger.error(Errors.INVALID_TEMPERATURE, payload);
       throw new HttpException(
-        'Temperature must be greater than 0.0',
+        Errors.INVALID_TEMPERATURE,
         HttpStatus.BAD_REQUEST,
       );
     }
@@ -72,6 +73,8 @@ export class ChatController {
     });
 
     const duration = this.timerService.stop();
+
+    this.logger.debug(`Done in ${duration} ms`, payload);
 
     return { answer, temperature, duration };
   }
