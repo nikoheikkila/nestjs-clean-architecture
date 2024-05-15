@@ -30,5 +30,15 @@ describe('ChatController', () => {
       expect(body.answer).toBe(expectedResponse);
       expect(body.duration).toBe(expectedDuration);
     });
+
+    it('throws error for empty prompt', async () => {
+      const { status, body } = await request(app.getHttpServer())
+        .post('/api/v1/chat')
+        .set('X-OpenAI-API-Key', 'ad7f9f0d-77ea-48f1-a8d8-c9d91727da47')
+        .send({ prompt: '' });
+
+      expect(status).toBe(HttpStatus.BAD_REQUEST);
+      expect(body.message).toBe('Prompt cannot be empty');
+    });
   });
 });

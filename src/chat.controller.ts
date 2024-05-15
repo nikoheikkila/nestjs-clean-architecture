@@ -1,5 +1,9 @@
-import { Controller, HttpCode, HttpStatus, Post } from "@nestjs/common";
+import { Body, Controller, HttpCode, HttpException, HttpStatus, Post, Req } from "@nestjs/common";
 import { ChatService } from './chat.service';
+
+interface ChatPayload {
+  prompt: string;
+}
 
 @Controller('api/v1/chat')
 export class ChatController {
@@ -7,7 +11,13 @@ export class ChatController {
 
   @Post()
   @HttpCode(HttpStatus.OK)
-  public async chat() {
+  public async chat(@Body() chatPayload: ChatPayload) {
+    const { prompt } = chatPayload;
+
+    if (prompt.length === 0) {
+      throw new HttpException('Prompt cannot be empty', HttpStatus.BAD_REQUEST);
+    }
+
     const answer = await this.chatService.generateAnswer();
     const duration = 500;
 
