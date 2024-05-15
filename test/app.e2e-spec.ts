@@ -1,10 +1,11 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { HttpStatus, INestApplication } from '@nestjs/common';
+import { HttpStatus, INestApplication, LoggerService } from "@nestjs/common";
 import * as request from 'supertest';
 import { AppModule } from '../src/app.module';
 import { ChatPayload, ChatService, Timer } from '../src/interfaces';
 import { OpenAIChatService } from '../src/chat.service';
-import { TimerService } from "../src/timer.service";
+import { TimerService } from '../src/timer.service';
+import { StructuredLogger } from "../src/logger.service";
 
 class FakeChatService implements ChatService {
   async generateAnswer(prompt: string): Promise<string> {
@@ -19,8 +20,33 @@ class FakeTimerService implements Timer {
   }
 }
 
+class NullLogger implements LoggerService {
+  private readonly _entries: string[];
+
+  constructor() {
+    this._entries = [];
+  }
+
+  public entries(): string[] {
+    return this._entries;
+  }
+
+  public error(message: string): void {
+    this._entries.push(message);
+  }
+
+  public log(message: string): void {
+    this._entries.push(message);
+  }
+
+  public warn(message: string): void {
+    this._entries.push(message);
+  }
+}
+
 describe('ChatController', () => {
   let app: INestApplication;
+  let logger: NullLogger;
 
   beforeEach(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
@@ -30,9 +56,13 @@ describe('ChatController', () => {
       .useClass(FakeChatService)
       .overrideProvider(TimerService)
       .useClass(FakeTimerService)
+      .overrideProvider(StructuredLogger)
+      .useClass(NullLogger)
       .compile();
 
     app = moduleFixture.createNestApplication();
+    logger = moduleFixture.get<NullLogger>(StructuredLogger);
+
     await app.init();
   });
 
@@ -68,33 +98,42 @@ describe('ChatController', () => {
     });
 
     it('throws error for empty prompt', async () => {
+      const errorMessage = 'Prompt cannot be empty';
+
       const { status, body: error } = await authorizedPost({
         prompt: '',
         temperature: 1.0,
       });
 
       expect(status).toBe(HttpStatus.BAD_REQUEST);
-      expect(error.message).toBe('Prompt cannot be empty');
+      expect(error.message).toBe(errorMessage);
+      expect(logger.entries()).toContain(errorMessage);
     });
 
     it('throws error for invalid temperature', async () => {
+      const errorMessage = 'Temperature must be greater than 0.0';
+
       const { status, body: error } = await authorizedPost({
         prompt: 'Hello',
         temperature: -1.0,
       });
 
       expect(status).toBe(HttpStatus.BAD_REQUEST);
-      expect(error.message).toBe('Temperature must be greater than 0.0');
+      expect(error.message).toBe(errorMessage);
+      expect(logger.entries()).toContain(errorMessage);
     });
 
     it('throws error for missing API key', async () => {
+      const errorMessage = 'Missing OpenAI API key in header';
+
       const { status, body: error } = await unauthorizedPost({
         prompt: 'Hello',
         temperature: 1.0,
       });
 
       expect(status).toBe(HttpStatus.UNAUTHORIZED);
-      expect(error.message).toBe('Missing OpenAI API key in header');
+      expect(error.message).toBe(errorMessage);
+      expect(logger.entries()).toContain(errorMessage);
     });
   });
 });
