@@ -9,11 +9,7 @@ import {
   Post,
 } from '@nestjs/common';
 import { ChatService } from './chat.service';
-
-interface ChatPayload {
-  prompt: string;
-  temperature: number;
-}
+import { ChatPayload } from './interfaces';
 
 @Controller('api/v1/chat')
 export class ChatController {
