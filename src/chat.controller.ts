@@ -26,9 +26,9 @@ export class ChatController {
     @Body() chatPayload: ChatPayload,
     @Headers() headers: Record<string, unknown>,
   ) {
-    this.timerService.start();
+    const token = headers['x-openai-api-key'] as string;
 
-    if (!headers['x-openai-api-key']) {
+    if (!token) {
       throw new HttpException(
         'Missing OpenAI API key in header',
         HttpStatus.UNAUTHORIZED,
@@ -48,7 +48,10 @@ export class ChatController {
       );
     }
 
+    this.timerService.start();
+
     const answer = await this.chatService.generateAnswer(prompt, {
+      token,
       temperature,
     });
 
@@ -57,4 +60,3 @@ export class ChatController {
     return { answer, temperature, duration };
   }
 }
-

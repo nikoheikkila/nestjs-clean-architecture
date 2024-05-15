@@ -4,6 +4,7 @@ export interface ChatPayload {
 }
 
 export interface ChatOptions {
+  token: string;
   temperature: number;
 }
 
