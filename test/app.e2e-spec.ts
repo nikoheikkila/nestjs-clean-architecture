@@ -1,11 +1,11 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { HttpStatus, INestApplication, LoggerService } from "@nestjs/common";
+import { HttpStatus, INestApplication, LoggerService } from '@nestjs/common';
 import * as request from 'supertest';
 import { AppModule } from '../src/app.module';
 import { ChatPayload, ChatService, Timer } from '../src/interfaces';
 import { OpenAIChatService } from '../src/chat.service';
 import { TimerService } from '../src/timer.service';
-import { StructuredLogger } from "../src/logger.service";
+import { StructuredLogger } from '../src/logger.service';
 
 class FakeChatService implements ChatService {
   async generateAnswer(prompt: string): Promise<string> {

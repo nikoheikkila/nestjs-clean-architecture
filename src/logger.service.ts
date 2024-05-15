@@ -1,7 +1,5 @@
 import { LoggerService, LogLevel } from '@nestjs/common';
 
-type Dictionary = Record<string, unknown>;
-
 export class StructuredLogger implements LoggerService {
   public debug(message: string, ...optionalParams: any[]): void {
     console.debug(this.structure(message, 'debug', optionalParams));
