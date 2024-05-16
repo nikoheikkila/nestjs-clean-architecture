@@ -11,6 +11,7 @@ env:
 tasks:
 
   install:
+    run: once
     sources:
       - package.json
       - yarn.lock
@@ -35,7 +36,12 @@ tasks:
   test:
     deps: [install, lint]
     cmds:
-      - npx jest --config ./test/jest-e2e.json
+      - npx vitest run
+
+  test:watch:
+    deps: [install]
+    cmds:
+      - npx vitest watch
 
   serve:
     cmds:
