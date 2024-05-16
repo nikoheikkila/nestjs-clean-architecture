@@ -1,18 +1,5 @@
-# Responds to a valid prompt and temperature with generated answer and duration
-POST http://localhost:3000/api/v1/chat
-X-OpenAI-API-Key: {{API_KEY}}
-{
-    "prompt": "Explain in simple terms what benefits does a software development team gain with Clean Architecture?",
-    "temperature": 1.0
-}
-HTTP 200
-[Asserts]
-jsonpath "$.answer" isString
-jsonpath "$.temperature" == 1.0
-jsonpath "$.duration" >= 0
-
 # Throws an error for missing prompt
-POST http://localhost:3000/api/v1/chat
+POST {{APP_URL}}/api/v1/chat
 X-OpenAI-API-Key: {{API_KEY}}
 {
     "temperature": 1.0
@@ -22,7 +9,7 @@ HTTP 400
 jsonpath "$.message" == "Prompt cannot be empty"
 
 # Throws an error for empty prompt
-POST http://localhost:3000/api/v1/chat
+POST {{APP_URL}}/api/v1/chat
 X-OpenAI-API-Key: {{API_KEY}}
 {
     "prompt": "",
@@ -33,7 +20,7 @@ HTTP 400
 jsonpath "$.message" == "Prompt cannot be empty"
 
 # Throws an error invalid temperature
-POST http://localhost:3000/api/v1/chat
+POST {{APP_URL}}/api/v1/chat
 X-OpenAI-API-Key: {{API_KEY}}
 {
     "prompt": "Some prompt text here",
@@ -44,7 +31,7 @@ HTTP 400
 jsonpath "$.message" == "Temperature must be greater than 0.0"
 
 # Throws an error for missing API key
-POST http://localhost:3000/api/v1/chat
+POST {{APP_URL}}/api/v1/chat
 {
     "prompt": "Some prompt text here",
     "temperature": 1.0
@@ -52,4 +39,3 @@ POST http://localhost:3000/api/v1/chat
 HTTP 401
 [Asserts]
 jsonpath "$.message" == "Missing OpenAI API key in header"
-

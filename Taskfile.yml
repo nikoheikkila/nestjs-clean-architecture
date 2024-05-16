@@ -2,6 +2,12 @@
 
 version: '3'
 
+vars:
+  PORT: 3000
+
+env:
+  APP_PORT: "{{ .PORT }}"
+
 tasks:
 
   install:
@@ -40,7 +46,16 @@ tasks:
     dir: test/specs
     silent: true
     cmds:
-      - hurl --test --variable API_KEY={{ .API_KEY }} *.hurl
+      - >
+        hurl
+        --test
+        --parallel
+        --jobs {{ .JOBS }}
+        --variable API_KEY={{ .API_KEY }}
+        --variable APP_URL={{ .APP_URL }}
+        ./**/*.hurl
     vars:
+      JOBS: 4
+      APP_URL: "http://localhost:{{ .PORT }}"
       API_KEY:
         sh: op read "op://Employee/OpenAI/Security/API_KEY"
