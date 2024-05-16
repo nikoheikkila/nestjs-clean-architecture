@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import { ChatOptions, ChatService } from './interfaces';
 import OpenAI from 'openai';
+import { ChatOptions, ChatService } from '../contracts/chat.contract';
 
 enum Model {
   OMNI = 'gpt-4o',

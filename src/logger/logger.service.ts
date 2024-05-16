@@ -25,7 +25,11 @@ export class StructuredLogger implements LoggerService {
     console.warn(this.structure(message, 'warn', optionalParams));
   }
 
-  private structure(message: string, level: LogLevel, ...extra: any[]): string {
+  protected structure(
+    message: string,
+    level: LogLevel,
+    ...extra: any[]
+  ): string {
     const extraParameters = extra.length > 0 ? extra[0] : [];
 
     return JSON.stringify({

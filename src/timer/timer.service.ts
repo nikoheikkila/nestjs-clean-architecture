@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import { Timer } from './interfaces';
+
+import { Timer } from '../contracts/timer.contract';
 
 @Injectable()
 export class TimerService implements Timer {

@@ -1,8 +1,7 @@
 import { Module } from '@nestjs/common';
-import { ChatController } from './chat.controller';
-import { OpenAIChatService } from './chat.service';
-import { TimerService } from './timer.service';
-import { StructuredLogger } from './logger.service';
+import { ChatController, OpenAIChatService } from './chat';
+import { TimerService } from './timer';
+import { StructuredLogger } from './logger';
 
 @Module({
   imports: [],

@@ -12,12 +12,13 @@ import {
   Req,
   UnauthorizedException,
 } from '@nestjs/common';
-import { ChatPayload, ChatService, Timer } from './interfaces';
 import { OpenAIChatService } from './chat.service';
-import { TimerService } from './timer.service';
-import { StructuredLogger } from './logger.service';
+import { TimerService } from '../timer/';
+import { StructuredLogger } from '../logger';
 import * as process from 'node:process';
-import { Errors } from './errors';
+import { Errors } from '../errors';
+import { ChatPayload, ChatService } from '../contracts/chat.contract';
+import { Timer } from '../contracts/timer.contract';
 
 const OPENAI_API_KEY = 'x-openai-api-key';
 

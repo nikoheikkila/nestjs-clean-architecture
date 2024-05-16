@@ -1,52 +1,12 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { HttpStatus, INestApplication, LoggerService } from '@nestjs/common';
+import { HttpStatus, INestApplication } from '@nestjs/common';
 import request from 'supertest';
 import { AppModule } from '../src/app.module';
-import { ChatPayload, ChatService, Timer } from '../src/interfaces';
-import { OpenAIChatService } from '../src/chat.service';
-import { TimerService } from '../src/timer.service';
-import { StructuredLogger } from '../src/logger.service';
-
-class FakeChatService implements ChatService {
-  async generateAnswer(prompt: string): Promise<string> {
-    return `Response: ${prompt}`;
-  }
-}
-
-class FakeTimerService implements Timer {
-  start() {}
-  stop() {
-    return 1000;
-  }
-}
-
-class NullLogger implements LoggerService {
-  private readonly _entries: string[];
-
-  constructor() {
-    this._entries = [];
-  }
-
-  public entries(): string[] {
-    return this._entries;
-  }
-
-  public debug(message: any): any {
-    this._entries.push(message);
-  }
-
-  public error(message: string): void {
-    this._entries.push(message);
-  }
-
-  public log(message: string): void {
-    this._entries.push(message);
-  }
-
-  public warn(message: string): void {
-    this._entries.push(message);
-  }
-}
+import { OpenAIChatService } from '../src/chat';
+import { TimerService } from '../src/timer';
+import { StructuredLogger } from '../src/logger';
+import { ChatPayload } from '../src/contracts/chat.contract';
+import { FakeChatService, FakeTimerService, NullLogger } from './fakes';
 
 describe('ChatController', () => {
   let app: INestApplication;
@@ -102,7 +62,7 @@ describe('ChatController', () => {
     });
 
     it('throw error for missing prompt', async () => {
-      const errorMessage = 'Prompt cannot be empty';
+      const errorMessage = /Prompt cannot be empty/;
 
       const { status, body: error } = await authorizedPost({
         prompt: undefined,
@@ -110,8 +70,8 @@ describe('ChatController', () => {
       });
 
       expect(status).toBe(HttpStatus.BAD_REQUEST);
-      expect(error.message).toBe(errorMessage);
-      expect(logger.entries()).toContain(errorMessage);
+      expect(error.message).toMatch(errorMessage);
+      expect(logger.messages()).toMatch(errorMessage);
     });
 
     it('throws error for empty prompt', async () => {
@@ -124,7 +84,7 @@ describe('ChatController', () => {
 
       expect(status).toBe(HttpStatus.BAD_REQUEST);
       expect(error.message).toBe(errorMessage);
-      expect(logger.entries()).toContain(errorMessage);
+      expect(logger.messages()).toContain(errorMessage);
     });
 
     it('throws error for invalid temperature', async () => {
@@ -137,7 +97,7 @@ describe('ChatController', () => {
 
       expect(status).toBe(HttpStatus.BAD_REQUEST);
       expect(error.message).toBe(errorMessage);
-      expect(logger.entries()).toContain(errorMessage);
+      expect(logger.messages()).toContain(errorMessage);
     });
 
     it('throws error for missing API key', async () => {
@@ -150,7 +110,7 @@ describe('ChatController', () => {
 
       expect(status).toBe(HttpStatus.UNAUTHORIZED);
       expect(error.message).toBe(errorMessage);
-      expect(logger.entries()).toContain(errorMessage);
+      expect(logger.messages()).toContain(errorMessage);
     });
   });
 });

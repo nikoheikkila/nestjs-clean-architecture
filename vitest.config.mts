@@ -11,7 +11,7 @@ export default defineConfig({
       include: ['src'],
       extension: ['.ts'],
       reporter: ['text', 'html'],
-      exclude: ['src/chat.service.ts', 'src/logger.service.ts', 'src/timer.service.ts', 'src/main.ts'],
+      exclude: ['src/chat/chat.service.ts', 'src/logger/logger.service.ts', 'src/timer/timer.service.ts', 'src/main.ts'],
     },
   },
 });

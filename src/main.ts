@@ -1,6 +1,6 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { StructuredLogger } from './logger.service';
+import { StructuredLogger } from './logger';
 
 const logger = new StructuredLogger();
 
