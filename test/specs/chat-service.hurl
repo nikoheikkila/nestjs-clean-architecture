@@ -42,3 +42,14 @@ X-OpenAI-API-Key: {{API_KEY}}
 HTTP 400
 [Asserts]
 jsonpath "$.message" == "Temperature must be greater than 0.0"
+
+# Throws an error for missing API key
+POST http://localhost:3000/api/v1/chat
+{
+    "prompt": "Some prompt text here",
+    "temperature": 1.0
+}
+HTTP 401
+[Asserts]
+jsonpath "$.message" == "Missing OpenAI API key in header"
+
