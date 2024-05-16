@@ -1,5 +1,3 @@
-# https://taskfile.dev
-
 version: '3'
 
 vars:
@@ -17,7 +15,8 @@ tasks:
       - package.json
       - yarn.lock
     cmds:
-      - yarn
+      - yarn set version 4.2.2
+      - yarn install --immutable
 
   dev:
     desc: Start development server
@@ -39,6 +38,8 @@ tasks:
     desc: Lint codebase
     deps: [install]
     dir: src
+    sources:
+      - ./**/*.ts
     cmds:
       - npx prettier --check .
       - npx eslint ./**/*.ts

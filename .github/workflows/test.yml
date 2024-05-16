@@ -1,0 +1,40 @@
+name: CI/CD
+
+on: [push, pull_request]
+
+jobs:
+  build:
+
+    name: Acceptance Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Enable Corepack
+        run: corepack enable
+
+      - name: Use Node.js 20.x
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: yarn
+
+      - name: Install Task
+        uses: arduino/setup-task@v2
+        with:
+          version: 3.x
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Restore Task cache
+        uses: actions/cache@v4
+        with:
+          path: .task/
+          key: ${{ runner.os }}-task-${{ hashFiles('**/Taskfile.yml') }}
+          restore-keys: |
+            ${{ runner.os }}-task-
+            ${{ runner.os }}
+
+      - name: Run tests
+        run: task test
