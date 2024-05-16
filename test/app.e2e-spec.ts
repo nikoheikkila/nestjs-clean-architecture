@@ -101,6 +101,19 @@ describe('ChatController', () => {
       });
     });
 
+    it('throw error for missing prompt', async () => {
+      const errorMessage = 'Prompt cannot be empty';
+
+      const { status, body: error } = await authorizedPost({
+        prompt: undefined,
+        temperature: 1.0,
+      });
+
+      expect(status).toBe(HttpStatus.BAD_REQUEST);
+      expect(error.message).toBe(errorMessage);
+      expect(logger.entries()).toContain(errorMessage);
+    });
+
     it('throws error for empty prompt', async () => {
       const errorMessage = 'Prompt cannot be empty';
 

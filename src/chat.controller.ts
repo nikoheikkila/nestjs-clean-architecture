@@ -52,7 +52,7 @@ export class ChatController {
 
     const { prompt, temperature } = chatPayload;
 
-    if (prompt.length === 0) {
+    if (!prompt || prompt.length === 0) {
       this.logger.error(Errors.EMPTY_PROMPT, payload);
       throw new BadRequestException(Errors.EMPTY_PROMPT);
     }
