@@ -11,6 +11,7 @@ env:
 tasks:
 
   install:
+    desc: Install dependencies
     run: once
     sources:
       - package.json
@@ -19,49 +20,65 @@ tasks:
       - yarn
 
   dev:
+    desc: Start development server
     deps: [install]
     cmds:
       - npx nest start --watch
 
   format:
+    desc: Format codebase
     deps: [install]
+    dir: src
+    sources:
+      - ./**/*.ts
     cmds:
-      - yarn format
+      - npx prettier --write .
+      - npx eslint ./**/*.ts --fix
 
   lint:
-    deps: [install, format]
+    desc: Lint codebase
+    deps: [install]
+    dir: src
     cmds:
-      - yarn lint
+      - npx prettier --check .
+      - npx eslint ./**/*.ts
 
   test:
+    desc: Run unit tests
     deps: [install, lint]
     cmds:
       - npx vitest run
 
   test:watch:
+    desc: Run unit tests in watch mode
     deps: [install]
     cmds:
       - npx vitest watch
 
-  serve:
+  build:
+    desc: Build Docker image
     cmds:
-      - docker compose up --build -d
+      - docker compose build
+
+  serve:
+    desc: Serve application and attach log view
+    deps: [build]
+    interactive: true
+    cmds:
+      - docker compose up -d
       - docker compose logs -f
 
-  test:integration:
-    dir: test/specs
-    silent: true
+  destroy:
+    desc: Destroy application
     cmds:
-      - >
-        hurl
-        --test
-        --parallel
-        --jobs {{ .JOBS }}
-        --variable API_KEY={{ .API_KEY }}
-        --variable APP_URL={{ .APP_URL }}
-        ./**/*.hurl
-    vars:
-      JOBS: 4
-      APP_URL: "http://localhost:{{ .PORT }}"
+      - docker compose down -v
+
+  test:integration:
+    desc: Run integration tests
+    cmds:
+      - defer:
+          task: destroy
+      - bash integration-tests.sh
+    env:
       API_KEY:
         sh: op read "op://Employee/OpenAI/Security/API_KEY"

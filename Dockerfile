@@ -7,7 +7,7 @@ RUN yarn install --immutable
 
 FROM dependencies AS build
 COPY . .
-RUN yarn build
+RUN npx nest build
 
 FROM node:20-alpine AS release
 WORKDIR /app
